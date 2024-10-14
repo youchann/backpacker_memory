@@ -1,5 +1,6 @@
 import { ReactElement, useEffect, useRef } from "react";
 import { Wrapper, Status } from "@googlemaps/react-wrapper";
+import "./App.css";
 
 const render = (status: Status): ReactElement => {
   if (status === Status.LOADING) return <h3>{status} ..</h3>;
@@ -28,7 +29,7 @@ function MyMapComponent({
 
 const App = () => {
   const center = { lat: -34.397, lng: 150.644 };
-  const zoom = 4;
+  const zoom = 2;
   return (
     <Wrapper
       apiKey={import.meta.env.VITE_GOOGLE_MAPS_PLATFORM_API_KEY}
