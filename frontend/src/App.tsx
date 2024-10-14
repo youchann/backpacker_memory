@@ -29,7 +29,7 @@ function MyMapComponent({
 
 const App = () => {
   const center = { lat: -34.397, lng: 150.644 };
-  const zoom = 2;
+  const zoom = 3;
   return (
     <Wrapper
       apiKey={import.meta.env.VITE_GOOGLE_MAPS_PLATFORM_API_KEY}
