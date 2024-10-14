@@ -31,7 +31,7 @@ const App = () => {
   const zoom = 4;
   return (
     <Wrapper
-      apiKey={import.meta.env.GOOGLE_MAPS_PLATFORM_API_KEY}
+      apiKey={import.meta.env.VITE_GOOGLE_MAPS_PLATFORM_API_KEY}
       render={render}
     >
       <MyMapComponent center={center} zoom={zoom} />
