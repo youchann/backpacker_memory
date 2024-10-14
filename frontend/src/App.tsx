@@ -1,35 +1,42 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
+import { ReactElement, useEffect, useRef } from "react";
+import { Wrapper, Status } from "@googlemaps/react-wrapper";
 
-function App() {
-  const [count, setCount] = useState(0);
+const render = (status: Status): ReactElement => {
+  if (status === Status.LOADING) return <h3>{status} ..</h3>;
+  if (status === Status.FAILURE) return <h3>{status} ...</h3>;
+  return <div />; // MEMO: 型の都合上書いているだけなので実際は使われない
+};
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  );
+function MyMapComponent({
+  center,
+  zoom,
+}: {
+  center: google.maps.LatLngLiteral;
+  zoom: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    new window.google.maps.Map(ref.current!, {
+      center,
+      zoom,
+    });
+  });
+
+  return <div ref={ref} id="map" />;
 }
+
+const App = () => {
+  const center = { lat: -34.397, lng: 150.644 };
+  const zoom = 4;
+  return (
+    <Wrapper
+      apiKey={import.meta.env.GOOGLE_MAPS_PLATFORM_API_KEY}
+      render={render}
+    >
+      <MyMapComponent center={center} zoom={zoom} />
+    </Wrapper>
+  );
+};
 
 export default App;
