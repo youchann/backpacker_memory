@@ -48,10 +48,8 @@ const MyMapComponent: FC<{
 };
 
 const Component: FC<{ onClickPin: () => void }> = memo(({ onClickPin }) => {
-  // TODO: 初期位置は要調整
-  const center = { lat: -34.397, lng: 150.644 };
+  const center = { lat: 41.3775, lng: 64.5853 };
   const zoom = 3;
-
   return (
     <Wrapper
       apiKey={import.meta.env.VITE_GOOGLE_MAPS_PLATFORM_API_KEY}
