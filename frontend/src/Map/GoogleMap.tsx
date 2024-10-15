@@ -1,6 +1,5 @@
 import { Status, Wrapper } from "@googlemaps/react-wrapper";
-import { FC, ReactElement, useEffect, useRef, useState } from "react";
-import Drawer from "./Drawer";
+import { FC, memo, ReactElement, useEffect, useRef } from "react";
 
 /**
  * 画像が存在するピンの座標群（モック）
@@ -48,31 +47,19 @@ const MyMapComponent: FC<{
   return <div ref={ref} id="map" />;
 };
 
-const Component = () => {
+const Component: FC<{ onClickPin: () => void }> = memo(({ onClickPin }) => {
   // TODO: 初期位置は要調整
   const center = { lat: -34.397, lng: 150.644 };
   const zoom = 3;
-  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
-  const handleClickPin = () => {
-    setIsDrawerOpen(true);
-  };
+
   return (
-    <>
-      {/* TODO: 状態が変わるたびに再描画されるのをどうにかする */}
-      <Wrapper
-        apiKey={import.meta.env.VITE_GOOGLE_MAPS_PLATFORM_API_KEY}
-        render={render}
-      >
-        <MyMapComponent
-          options={{ center, zoom }}
-          onClickPin={handleClickPin}
-        />
-      </Wrapper>
-      <Drawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
-        <div>hoge</div>
-      </Drawer>
-    </>
+    <Wrapper
+      apiKey={import.meta.env.VITE_GOOGLE_MAPS_PLATFORM_API_KEY}
+      render={render}
+    >
+      <MyMapComponent options={{ center, zoom }} onClickPin={onClickPin} />
+    </Wrapper>
   );
-};
+});
 
 export default Component;

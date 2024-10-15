@@ -16,7 +16,7 @@ interface Props {
   children: ReactNode;
 }
 
-const Drawer: FC<Props> = ({ isOpen, onClose, children }) => {
+const Component: FC<Props> = ({ isOpen, onClose, children }) => {
   return (
     <MUIDrawer anchor="bottom" open={isOpen} onClose={onClose}>
       <StyledBox sx={{ p: 2, height: "80vh" }}>{children}</StyledBox>
@@ -24,4 +24,4 @@ const Drawer: FC<Props> = ({ isOpen, onClose, children }) => {
   );
 };
 
-export default Drawer;
+export default Component;
