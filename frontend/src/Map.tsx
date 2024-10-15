@@ -1,5 +1,5 @@
 import { Status, Wrapper } from "@googlemaps/react-wrapper";
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { FC, ReactElement, useEffect, useRef, useState } from "react";
 import Drawer from "./Drawer";
 
 /**
@@ -24,10 +24,13 @@ const render = (status: Status): ReactElement => {
   return <div />; // MEMO: 型の都合上書いているだけなので実際は使われない
 };
 
-const MyMapComponent = (ops: google.maps.MapOptions) => {
+const MyMapComponent: FC<{
+  options: google.maps.MapOptions;
+  onClickPin: () => void;
+}> = ({ options, onClickPin }) => {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const map = new window.google.maps.Map(ref.current!, ops);
+    const map = new window.google.maps.Map(ref.current!, options);
     for (const pin of pinsMock) {
       // MEMO: google.maps.MarkerはDeprecatedだが代替となるgoogle.maps.marker.AdvancedMarkerElementが使えないため一旦このままで
       const marker = new window.google.maps.Marker({
@@ -37,7 +40,7 @@ const MyMapComponent = (ops: google.maps.MapOptions) => {
       });
       marker.addListener("click", () => {
         // TODO: 画像一覧を出力する
-        console.log(pin);
+        onClickPin();
       });
     }
   });
@@ -46,21 +49,28 @@ const MyMapComponent = (ops: google.maps.MapOptions) => {
 };
 
 const Component = () => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   // TODO: 初期位置は要調整
   const center = { lat: -34.397, lng: 150.644 };
   const zoom = 3;
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const handleClickPin = () => {
+    setIsDrawerOpen(true);
+  };
   return (
     <>
+      {/* TODO: 状態が変わるたびに再描画されるのをどうにかする */}
       <Wrapper
         apiKey={import.meta.env.VITE_GOOGLE_MAPS_PLATFORM_API_KEY}
         render={render}
       >
-        <MyMapComponent center={center} zoom={zoom} />
+        <MyMapComponent
+          options={{ center, zoom }}
+          onClickPin={handleClickPin}
+        />
       </Wrapper>
-      {/* <Drawer open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <Drawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
         <div>hoge</div>
-      </Drawer> */}
+      </Drawer>
     </>
   );
 };
