@@ -23,20 +23,10 @@ const render = (status: Status): ReactElement => {
   return <div />; // MEMO: 型の都合上書いているだけなので実際は使われない
 };
 
-const MyMapComponent = ({
-  center,
-  zoom,
-}: {
-  center: google.maps.LatLngLiteral;
-  zoom: number;
-}) => {
+const MyMapComponent = (ops: google.maps.MapOptions) => {
   const ref = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
-    const map = new window.google.maps.Map(ref.current!, {
-      center,
-      zoom,
-    });
+    const map = new window.google.maps.Map(ref.current!, ops);
     for (const pin of pinsMock) {
       // MEMO: google.maps.MarkerはDeprecatedだが代替となるgoogle.maps.marker.AdvancedMarkerElementが使えないため一旦このままで
       const marker = new window.google.maps.Marker({
