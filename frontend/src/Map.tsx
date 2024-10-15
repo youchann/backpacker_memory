@@ -1,5 +1,6 @@
 import { Status, Wrapper } from "@googlemaps/react-wrapper";
-import { ReactElement, useEffect, useRef } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
+import Drawer from "./Drawer";
 
 /**
  * 画像が存在するピンの座標群（モック）
@@ -45,16 +46,22 @@ const MyMapComponent = (ops: google.maps.MapOptions) => {
 };
 
 const Component = () => {
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   // TODO: 初期位置は要調整
   const center = { lat: -34.397, lng: 150.644 };
   const zoom = 3;
   return (
-    <Wrapper
-      apiKey={import.meta.env.VITE_GOOGLE_MAPS_PLATFORM_API_KEY}
-      render={render}
-    >
-      <MyMapComponent center={center} zoom={zoom} />
-    </Wrapper>
+    <>
+      <Wrapper
+        apiKey={import.meta.env.VITE_GOOGLE_MAPS_PLATFORM_API_KEY}
+        render={render}
+      >
+        <MyMapComponent center={center} zoom={zoom} />
+      </Wrapper>
+      {/* <Drawer open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <div>hoge</div>
+      </Drawer> */}
+    </>
   );
 };
 
