@@ -1,6 +1,6 @@
 import { Status, Wrapper } from "@googlemaps/react-wrapper";
 import { FC, memo, ReactElement, useEffect, useRef } from "react";
-import { Coordinate } from "./utils";
+import { Pin } from "./utils";
 
 const render = (status: Status): ReactElement => {
   if (status === Status.LOADING) return <h3>{status} Loading</h3>;
@@ -10,8 +10,8 @@ const render = (status: Status): ReactElement => {
 
 const MyMapComponent: FC<{
   options: google.maps.MapOptions;
-  onClickPin: () => void;
-  pins: Coordinate[];
+  onClickPin: (pin: Pin) => void;
+  pins: Pin[];
 }> = ({ options, onClickPin, pins }) => {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -21,11 +21,11 @@ const MyMapComponent: FC<{
       const marker = new window.google.maps.Marker({
         map,
         position: pin,
-        title: `${pin.lat}:${pin.lng}`,
+        title: pin.regionName,
       });
       marker.addListener("click", () => {
         // TODO: 画像一覧を出力する
-        onClickPin();
+        onClickPin(pin);
       });
     }
   });
@@ -33,7 +33,7 @@ const MyMapComponent: FC<{
   return <div ref={ref} id="map" />;
 };
 
-const Component: FC<{ onClickPin: () => void; pins: Coordinate[] }> = memo(
+const Component: FC<{ onClickPin: (pin: Pin) => void; pins: Pin[] }> = memo(
   ({ onClickPin, pins }) => {
     const center = { lat: 41.3775, lng: 64.5853 };
     const zoom = 3;

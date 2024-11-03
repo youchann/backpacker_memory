@@ -1,42 +1,43 @@
 import { useCallback, useState } from "react";
 import Drawer from "./Drawer";
+import DrawerContent from "./DrawerContent";
 import GoogleMap from "./GoogleMap";
-import { Box, Skeleton } from "@mui/material";
-import theme from "../theme";
-import { URL_GET_JOURNEY_PLOT } from "../const";
+import { URL_GET_IMAGE_URLS, URL_GET_JOURNEY_PINS } from "../const";
 import { useFetcher } from "../hooks/fetcher";
-import { parseCoordinates } from "./utils";
+import { formatPin, parsePins, Pin } from "./utils";
 
 const Component = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
-  const { data, error, isLoading } = useFetcher(URL_GET_JOURNEY_PLOT);
-  const handleClickPin = useCallback(() => {
+  const [activePin, setActivePin] = useState<Pin | null>(null);
+
+  const {
+    data: pinData,
+    error: journeyPinsError,
+    isLoading: isJourneyPinsLoading,
+  } = useFetcher(URL_GET_JOURNEY_PINS);
+  const { data: imageURLsData, isLoading: isImageUrlsLoading } = useFetcher(
+    `${URL_GET_IMAGE_URLS}/${formatPin(activePin)}.txt`,
+    {
+      isPaused: () => activePin === null,
+    },
+  );
+
+  const handleClickPin = useCallback((pin: Pin) => {
+    setActivePin(pin);
     setIsDrawerOpen(true);
   }, []);
-  if (error) return <div>failed to load</div>;
-  if (isLoading) return <div>loading...</div>;
+
+  if (journeyPinsError) return <div>failed to load</div>;
+  if (isJourneyPinsLoading) return <div>loading...</div>;
+
   return (
     <>
-      <GoogleMap onClickPin={handleClickPin} pins={parseCoordinates(data)} />
+      <GoogleMap onClickPin={handleClickPin} pins={parsePins(pinData)} />
       <Drawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: theme.spacing(1),
-            width: "100%",
-          }}
-        >
-          {[...Array(5)].map((_, index) => (
-            <Skeleton
-              key={index}
-              variant="rectangular"
-              width={100}
-              height={100}
-              sx={{ flexShrink: 0 }}
-            />
-          ))}
-        </Box>
+        <DrawerContent
+          isLoading={isImageUrlsLoading}
+          imageUrls={imageURLsData ? imageURLsData.split("\n") : []}
+        />
       </Drawer>
     </>
   );
