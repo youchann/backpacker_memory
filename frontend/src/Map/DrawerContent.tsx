@@ -1,5 +1,6 @@
 import { Box, Skeleton } from "@mui/material";
 import { FC } from "react";
+import { Image } from "@unpic/react";
 import theme from "../theme";
 
 interface Props {
@@ -28,13 +29,13 @@ const Component: FC<Props> = ({ isLoading, imageUrls }) => {
             />
           ))
         : imageUrls.map((url, index) => (
-            <img
+            <Image
               key={index}
+              layout="constrained"
               src={url}
               alt={`Image ${index}`}
               width={100}
               height={100}
-              style={{ objectFit: "cover" }}
             />
           ))}
     </Box>
