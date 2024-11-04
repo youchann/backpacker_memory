@@ -16,10 +16,7 @@ const Component = () => {
     isLoading: isJourneyPinsLoading,
   } = useFetcher(URL_GET_JOURNEY_PINS);
   const { data: imageURLsData, isLoading: isImageUrlsLoading } = useFetcher(
-    `${URL_GET_IMAGE_URLS}/${formatPin(activePin)}.txt`,
-    {
-      isPaused: () => activePin === null,
-    },
+    activePin ? `${URL_GET_IMAGE_URLS}/${formatPin(activePin)}.txt` : null,
   );
 
   const handleClickPin = useCallback((pin: Pin) => {

@@ -1,7 +1,8 @@
-import { Box, Skeleton } from "@mui/material";
-import { FC } from "react";
-import { Image } from "@unpic/react";
-import theme from "../theme";
+import { CircularProgress } from "@mui/material";
+import { FC, useMemo, useState } from "react";
+import { Gallery, Image as ImageType } from "react-grid-gallery";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 
 interface Props {
   isLoading: boolean;
@@ -9,36 +10,27 @@ interface Props {
 }
 
 const Component: FC<Props> = ({ isLoading, imageUrls }) => {
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: theme.spacing(1),
-        width: "100%",
-      }}
-    >
-      {isLoading
-        ? [...Array(5)].map((_, index) => (
-            <Skeleton
-              key={index}
-              variant="rectangular"
-              width={100}
-              height={100}
-              sx={{ flexShrink: 0 }}
-            />
-          ))
-        : imageUrls.map((url, index) => (
-            <Image
-              key={index}
-              layout="constrained"
-              src={url}
-              alt={`Image ${index}`}
-              width={100}
-              height={100}
-            />
-          ))}
-    </Box>
+  const [index, setIndex] = useState(-1);
+  const images: ImageType[] = useMemo<ImageType[]>(() => {
+    return imageUrls.map((url) => ({
+      src: url,
+      width: 0,
+      height: 0,
+    }));
+  }, [imageUrls]);
+  const handleClick = (index: number) => setIndex(index);
+  return isLoading ? (
+    <CircularProgress />
+  ) : (
+    <>
+      <Gallery images={images} onClick={handleClick} />
+      <Lightbox
+        slides={images}
+        open={index >= 0}
+        index={index}
+        close={() => setIndex(-1)}
+      />
+    </>
   );
 };
 
