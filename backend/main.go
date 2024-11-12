@@ -1,18 +1,22 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-gonic/gin"
+	"github.com/youchann/backpacker_memory/backend/client/aws"
 )
+
+var s3BucketName = "backpacker-images"
+var s3regionsPath = "pins/"
 
 func main() {
 	r := gin.Default()
+	s3Client, err := aws.NewS3Client(s3BucketName)
+	if err != nil {
+		log.Fatal("Failed to create S3 client:", err)
+	}
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -20,37 +24,40 @@ func main() {
 		})
 	})
 
-	r.GET("/ping", func(c *gin.Context) {
+	r.GET("/regions", func(c *gin.Context) {
+		regions, err := s3Client.GetDirectoryNames(c, s3regionsPath)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Failed to get regions",
+			})
+			return
+		}
 		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
+			"regions": regions,
 		})
 	})
 
-	r.GET("/hoge", func(c *gin.Context) {
-		// バケット名を指定
-		bucketName := "backpacker-images"
-
-		// AWSの設定をロード
-		cfg, err := config.LoadDefaultConfig(context.TODO())
-		if err != nil {
-			log.Fatalf("AWS設定の読み込みに失敗: %v", err)
+	r.GET("/regions/:region", func(c *gin.Context) {
+		region := c.Param("region")
+		if region == "" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "Region parameter is required",
+			})
+			return
 		}
 
-		// S3クライアントを作成
-		client := s3.NewFromConfig(cfg)
+		s3Path := s3regionsPath + region + "/"
 
-		// バケット内のオブジェクト一覧を取得（アクセス権限の確認）
-		_, err = client.ListObjectsV2(context.TODO(), &s3.ListObjectsV2Input{
-			Bucket: &bucketName,
-		})
+		urls, err := s3Client.GetObjectPublicURLs(c, s3Path)
 		if err != nil {
-			log.Fatalf("バケット '%s' へのアクセスに失敗: %v", bucketName, err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Failed to get region data",
+			})
+			return
 		}
-
-		fmt.Printf("バケット '%s' へのアクセスに成功しました\n", bucketName)
 
 		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
+			"urls": urls,
 		})
 	})
 
