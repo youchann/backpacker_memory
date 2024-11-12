@@ -1,19 +1,22 @@
-FROM golang:1.23.2-alpine
+FROM golang:1.23.2-alpine AS builder
 
 WORKDIR /app
 
-RUN apk add --no-cache \
-    git \
-    make \
-    gcc \
-    libc-dev
-
-RUN go install github.com/air-verse/air@latest
-
 COPY go.mod go.sum ./
-
 RUN go mod download
 
 COPY . .
 
-CMD ["air"]
+ENV GOOS=linux
+ENV GOARCH=amd64
+RUN CGO_ENABLED=0 go build -o main .
+
+# 実行ステージ
+FROM alpine:latest
+
+WORKDIR /app
+
+COPY --from=builder /app/main .
+
+EXPOSE 8080
+CMD ["./main"]
