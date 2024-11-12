@@ -5,6 +5,7 @@ services:
       dockerfile: "Dockerfile.dev"
     volumes:
       - .:/app
+      - ${HOME}/.aws:/root/.aws:ro
     ports:
       - "8080:8080"
     environment:
