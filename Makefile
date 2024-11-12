@@ -17,3 +17,11 @@ frontend-deploy:
 	(cd $(FRONTEND_DIR) && \
 		npm run build && \
 		aws s3 cp ./dist s3://$(S3_BUCKET)/ --recursive)
+
+# TODO: Account IDをCommitしたくないので、後ほどCI/CDを作る
+# .PHONY: backend-deploy backend-build backend-push
+# backand-deploy: backand-build backand-push
+# backend-build:
+# 	docker build -t xxxxxxxxx.dkr.ecr.ap-northeast-1.amazonaws.com/backpacker-memory-backend:latest ./backend
+# backend-push:
+# 	docker push xxxxxxxxx.dkr.ecr.ap-northeast-1.amazonaws.com/backpacker-memory-backend:latest
