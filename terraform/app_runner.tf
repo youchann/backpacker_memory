@@ -40,6 +40,31 @@ resource "aws_iam_role" "app_runner_instance" {
   })
 }
 
+resource "aws_iam_policy" "app_runner_instance_s3_policy" {
+  name = "backpacker-memory-backend-app-runner-instance-s3-policy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket",
+        ]
+        Resource = [
+          aws_s3_bucket.backpacker_memory.arn,
+          "${aws_s3_bucket.backpacker_memory.arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "app_runner_instance_s3_policy_attachment" {
+  role       = aws_iam_role.app_runner_instance.name
+  policy_arn = aws_iam_policy.app_runner_instance_s3_policy.arn
+}
+
 resource "aws_apprunner_service" "backpacker_memory_backend" {
   service_name = "backpacker-memory-backend"
   source_configuration {
