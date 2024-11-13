@@ -5,7 +5,7 @@ const fetcher = (url: string) =>
     method: "GET",
     mode: "cors",
     credentials: "omit",
-  }).then((r) => r.text() as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+  }).then((r) => r.json());
 
 export function useFetcher<Data = any, Error = any>( // eslint-disable-line @typescript-eslint/no-explicit-any
   key: Key,

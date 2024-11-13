@@ -3,17 +3,16 @@ export interface Pin extends google.maps.LatLngLiteral {
 }
 
 /**
- * ファイル名から座標情報と地域名を抽出し、構造体の配列に変換する関数
+ * ディレクトリ名から座標情報と地域名を抽出し、構造体の配列に変換する関数
  *
- * @param text 改行区切りのファイル名テキスト
+ * @param pins ディレクトリ名の配列
  * @returns 座標情報と地域名の配列
  * @example
- * Input: "47.497N_19.040E_Budapest"
- * Output: { lat: 47.497, lng: 19.040, regionName: "Budapest" }
+ * Input: ["47.497N_19.040E_Budapest"]
+ * Output: [{ lat: 47.497, lng: 19.040, regionName: "Budapest" }]
  */
-export const parsePins = (text: string): Pin[] =>
-  text
-    .split("\n")
+export const parsePins = (pins: string[]): Pin[] =>
+  pins
     .filter((line) => line.trim() !== "")
     .map((filename) => {
       const match = filename.match(/^(\d+\.\d+)N_(\d+\.\d+)E_(.+)$/);

@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import Drawer from "./Drawer";
 import DrawerContent from "./DrawerContent";
 import GoogleMap from "./GoogleMap";
-import { URL_GET_IMAGE_URLS, URL_GET_JOURNEY_PINS } from "../const";
+import { URL_GET_REGIONS } from "../const";
 import { useFetcher } from "../hooks/fetcher";
 import { formatPin, parsePins, Pin } from "./utils";
 
@@ -14,10 +14,10 @@ const Component = () => {
     data: pinData,
     error: journeyPinsError,
     isLoading: isJourneyPinsLoading,
-  } = useFetcher(URL_GET_JOURNEY_PINS);
-  const { data: imageURLsData, isLoading: isImageUrlsLoading } = useFetcher(
-    activePin ? `${URL_GET_IMAGE_URLS}/${formatPin(activePin)}.txt` : null,
-  );
+  } = useFetcher<{ regions: string[] }>(URL_GET_REGIONS);
+  const { data: imageURLsData, isLoading: isImageUrlsLoading } = useFetcher<{
+    urls: string[];
+  }>(activePin ? `${URL_GET_REGIONS}/${formatPin(activePin)}` : null);
 
   const handleClickPin = useCallback((pin: Pin) => {
     setActivePin(pin);
@@ -29,11 +29,14 @@ const Component = () => {
 
   return (
     <>
-      <GoogleMap onClickPin={handleClickPin} pins={parsePins(pinData)} />
+      <GoogleMap
+        onClickPin={handleClickPin}
+        pins={parsePins(pinData?.regions ?? [])}
+      />
       <Drawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
         <DrawerContent
           isLoading={isImageUrlsLoading}
-          imageUrls={imageURLsData ? imageURLsData.split("\n") : []}
+          imageUrls={imageURLsData?.urls ?? []}
         />
       </Drawer>
     </>
