@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/youchann/backpacker_memory/backend/client/aws"
 )
@@ -13,6 +14,14 @@ var s3regionsPath = "pins/"
 
 func main() {
 	r := gin.Default()
+
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://localhost:5173", "https://backpacker-images.s3.ap-northeast-1.amazonaws.com"}
+	config.AllowMethods = []string{"GET", "OPTIONS"}
+	config.AllowHeaders = []string{"Accept", "Content-Type", "Content-Language", "Accept-Language"}
+
+	r.Use(cors.New(config))
+
 	s3Client, err := aws.NewS3Client(s3BucketName)
 	if err != nil {
 		log.Fatal("Failed to create S3 client:", err)
@@ -45,9 +54,7 @@ func main() {
 			})
 			return
 		}
-
 		s3Path := s3regionsPath + region + "/"
-
 		urls, err := s3Client.GetObjectPublicURLs(c, s3Path)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -55,7 +62,6 @@ func main() {
 			})
 			return
 		}
-
 		c.JSON(http.StatusOK, gin.H{
 			"urls": urls,
 		})
